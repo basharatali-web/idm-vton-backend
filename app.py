@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
@@ -11,6 +11,13 @@ def test():
     return jsonify({
         "success": True,
         "message": "Python backend working"
+    })
+
+@app.route("/tryon")
+def tryon():
+    return jsonify({
+        "success": True,
+        "message": "Try-On endpoint ready"
     })
 
 if __name__ == "__main__":
