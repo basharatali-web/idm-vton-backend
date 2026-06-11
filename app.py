@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+import os
 
 app = Flask(__name__)
 
@@ -11,6 +12,22 @@ def test():
     return jsonify({
         "success": True,
         "message": "Python backend working"
+    })
+
+@app.route("/hf-test")
+def hf_test():
+
+    token = os.getenv("HF_TOKEN")
+
+    if token:
+        return jsonify({
+            "success": True,
+            "message": "HF token found"
+        })
+
+    return jsonify({
+        "success": False,
+        "message": "HF token missing"
     })
 
 @app.route("/tryon")
