@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from gradio_client import Client
 import os
 
 app = Flask(__name__)
@@ -32,12 +33,9 @@ def space_test():
 
     try:
 
-        space_name = "hysts-duplicates/IDM-VTON"
-
         return jsonify({
             "success": True,
-            "space_name": space_name,
-            "space_name_repr": repr(space_name)
+            "client_imported": True
         })
 
     except Exception as e:
