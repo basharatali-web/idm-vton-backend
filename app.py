@@ -33,9 +33,11 @@ def space_test():
 
     try:
 
+        client = Client("hysts-duplicates/IDM-VTON")
+
         return jsonify({
             "success": True,
-            "client_imported": True
+            "message": "Client created successfully"
         })
 
     except Exception as e:
