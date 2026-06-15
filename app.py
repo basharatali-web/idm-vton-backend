@@ -1,6 +1,5 @@
 from flask import Flask, jsonify
 from gradio_client import Client
-import traceback
 import os
 
 app = Flask(__name__)
@@ -36,18 +35,18 @@ def space_test():
 
         client = Client("hysts-duplicates/IDM-VTON")
 
+        api_info = client.view_api()
+
         return jsonify({
             "success": True,
-            "message": "Client created successfully"
+            "api": str(api_info)
         })
 
     except Exception as e:
 
         return jsonify({
             "success": False,
-            "error": str(e),
-            "type": str(type(e)),
-            "trace": traceback.format_exc()
+            "error": str(e)
         })
 
 
