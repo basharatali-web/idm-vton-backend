@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
-from gradio_client import Client
+from gradio_client import Client, handle_file
 import os
+import traceback
 
 app = Flask(__name__)
 
@@ -35,18 +36,37 @@ def space_test():
 
         client = Client("hysts-duplicates/IDM-VTON")
 
-        api_info = client.view_api()
+        result = client.predict(
+            dict={
+                "background": handle_file(
+                    "https://raw.githubusercontent.com/gradio-app/gradio/main/test/test_files/bus.png"
+                ),
+                "layers": [],
+                "composite": None
+            },
+            garm_img=handle_file(
+                "https://raw.githubusercontent.com/gradio-app/gradio/main/test/test_files/bus.png"
+            ),
+            garment_des="test",
+            is_checked=True,
+            is_checked_crop=False,
+            denoise_steps=30,
+            seed=42,
+            api_name="/tryon"
+        )
 
         return jsonify({
             "success": True,
-            "api": str(api_info)
+            "result_type": str(type(result)),
+            "result": str(result)
         })
 
     except Exception as e:
 
         return jsonify({
             "success": False,
-            "error": str(e)
+            "error": str(e),
+            "trace": traceback.format_exc()
         })
 
 
