@@ -1,53 +1,62 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from gradio_client import Client, handle_file
-import os
+from PIL import Image
+import tempfile
+import base64
 import traceback
+import os
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
     return "IDM-VTON Backend Running"
 
 
-@app.route("/test")
-def test():
-    return jsonify({
-        "success": True,
-        "message": "Python backend working"
-    })
-
-
-@app.route("/hf-test")
-def hf_test():
-
-    token = os.getenv("HF_TOKEN")
-
-    return jsonify({
-        "success": bool(token),
-        "message": "HF token found" if token else "HF token missing"
-    })
-
-
-@app.route("/space-test")
-def space_test():
+@app.route("/tryon", methods=["POST"])
+def tryon():
 
     try:
+
+        data = request.get_json()
+
+        user_image_b64 = data["userImage"]
+        cloth_image_b64 = data["clothImage"]
+
+        # Remove data:image/...;base64,
+        user_image_b64 = user_image_b64.split(",")[1]
+        cloth_image_b64 = cloth_image_b64.split(",")[1]
+
+        user_bytes = base64.b64decode(user_image_b64)
+        cloth_bytes = base64.b64decode(cloth_image_b64)
+
+        user_temp = tempfile.NamedTemporaryFile(
+            suffix=".png",
+            delete=False
+        )
+
+        cloth_temp = tempfile.NamedTemporaryFile(
+            suffix=".png",
+            delete=False
+        )
+
+        user_temp.write(user_bytes)
+        cloth_temp.write(cloth_bytes)
+
+        user_temp.close()
+        cloth_temp.close()
 
         client = Client("hysts-duplicates/IDM-VTON")
 
         result = client.predict(
             dict={
-                "background": handle_file(
-                    "https://raw.githubusercontent.com/gradio-app/gradio/main/test/test_files/bus.png"
-                ),
+                "background": handle_file(user_temp.name),
                 "layers": [],
                 "composite": None
             },
-            garm_img=handle_file(
-                "https://raw.githubusercontent.com/gradio-app/gradio/main/test/test_files/bus.png"
-            ),
-            garment_des="test",
+            garm_img=handle_file(cloth_temp.name),
+            garment_des="shirt",
             is_checked=True,
             is_checked_crop=False,
             denoise_steps=30,
@@ -57,7 +66,8 @@ def space_test():
 
         return jsonify({
             "success": True,
-            "result_type": str(type(result)),
+            "type": str(type(result)),
+            "length": len(result) if hasattr(result, "__len__") else None,
             "result": str(result)
         })
 
@@ -66,18 +76,13 @@ def space_test():
         return jsonify({
             "success": False,
             "error": str(e),
+            "type": str(type(e)),
             "trace": traceback.format_exc()
         })
 
 
-@app.route("/tryon")
-def tryon():
-
-    return jsonify({
-        "success": True,
-        "message": "Try-On endpoint ready"
-    })
-
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(
+        host="0.0.0.0",
+        port=10000
+    )
