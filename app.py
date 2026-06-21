@@ -1,14 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from gradio_client import Client, handle_file
-from PIL import Image
 import tempfile
 import base64
 import traceback
-import os
 
 app = Flask(__name__)
-
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
 CORS(app)
 
@@ -28,7 +25,6 @@ def tryon():
         user_image_b64 = data["userImage"]
         cloth_image_b64 = data["clothImage"]
 
-        # Remove data:image/...;base64,
         user_image_b64 = user_image_b64.split(",")[1]
         cloth_image_b64 = cloth_image_b64.split(",")[1]
 
@@ -78,9 +74,10 @@ def tryon():
     except Exception as e:
 
         return jsonify({
-    "success": True,
-    "result": str(result)
-})
+            "success": False,
+            "error": str(e),
+            "trace": traceback.format_exc()
+        })
 
 
 if __name__ == "__main__":
