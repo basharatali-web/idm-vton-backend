@@ -64,7 +64,7 @@ def tryon():
             api_name="/tryon"
         )
 
-        output_path = result[0]
+        output_path = result[1]
 
 with open(output_path, "rb") as f:
     image_base64 = base64.b64encode(
