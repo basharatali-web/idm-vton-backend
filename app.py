@@ -66,15 +66,16 @@ def tryon():
 
         output_path = result[1]
 
-with open(output_path, "rb") as f:
-    image_base64 = base64.b64encode(
-        f.read()
-    ).decode("utf-8")
+        with open(output_path, "rb") as f:
+            image_base64 = base64.b64encode(
+                f.read()
+            ).decode("utf-8")
 
-return jsonify({
-    "success": True,
-    "image": "data:image/webp;base64," + image_base64
-})
+        return jsonify({
+            "success": True,
+            "image": "data:image/webp;base64," + image_base64
+        })
+
     except Exception as e:
 
         return jsonify({
